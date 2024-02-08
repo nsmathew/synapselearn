@@ -1,5 +1,5 @@
 {
-	"name": "Bronze to Silver",
+	"name": "Silver to Bronze",
 	"properties": {
 		"nbformat": 4,
 		"nbformat_minor": 2,
@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "53dbb26f-c3b9-4592-b64d-f24a637e9dde"
+				"spark.autotune.trackingId": "6a2abcb1-0dc4-43b9-82ae-6df4de1e0c6a"
 			}
 		},
 		"metadata": {
@@ -69,7 +69,7 @@
 					"from pyspark.sql.types  import TimestampType\r\n",
 					"from notebookutils import mssparkutils"
 				],
-				"execution_count": 18
+				"execution_count": 1
 			},
 			{
 				"cell_type": "markdown",
@@ -99,11 +99,11 @@
 				},
 				"source": [
 					"jobid = mssparkutils.env.getJobId()\r\n",
-					"input_path = 'synfs:/' + jobid + '/mnt/bronze/SalesLT/'\r\n",
-					"output_path = 'synfs:/' + jobid + '/mnt/silver/SalesLT/'\r\n",
+					"input_path = 'synfs:/' + jobid + '/mnt/silver/SalesLT/'\r\n",
+					"output_path = 'synfs:/' + jobid + '/mnt/gold/SalesLT/'\r\n",
 					"#input_path\r\n",
-					"mount_point_src = '/mnt/bronze'\r\n",
-					"mount_point_dest = '/mnt/silver'"
+					"mount_point_src = '/mnt/silver'\r\n",
+					"mount_point_dest = '/mnt/gold'"
 				],
 				"execution_count": 61
 			},
@@ -235,12 +235,13 @@
 				"source": [
 					"for i in table_name:\r\n",
 					"    in_path = input_path + i + '/' + i +'.parquet'\r\n",
-					"    df = spark.read.format('parquet').load(in_path)\r\n",
+					"    df = spark.read.format('delta').load(in_path)\r\n",
 					"    columns = df.columns\r\n",
 					"\r\n",
-					"    for col in columns:\r\n",
-					"        if \"Date\" in col or \"date\" in col:\r\n",
-					"            df = df.withColumn(col, date_format(from_utc_timestamp(df[col].cast(TimestampType()), \"UTC\"), \"yyyy-MM-dd\"))\r\n",
+					"    for old_col in columns:\r\n",
+					"        new_col = \"\".join([\"_\" + char if char.isupper() and not old_col[i-1].isupper() else char for i, char in enumerate(old_col)]).lstrip(\"_\")\r\n",
+					"        df = df.withColumnRenamed(old_col, new_col)\r\n",
+					"        \r\n",
 					"    out_path = output_path + i + '/'\r\n",
 					"    df.write.format('delta').mode('overwrite').save(out_path)\r\n",
 					""
