@@ -1,0 +1,23 @@
+{
+	"name": "SqlServer1",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=localhost;Initial Catalog=AdventureWorksLT2017;User ID=nsmlocal",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_keyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "localsqlPassword"
+			}
+		},
+		"connectVia": {
+			"referenceName": "IntegrationRuntime1",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
