@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "synapsensm"
+		},
+		"SqlServer1_connectionString": {
+			"value": "Integrated Security=False;Data Source=localhost;Initial Catalog=AdventureWorksLT2017;User ID=nsmlocal"
+		},
+		"synapsensm-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapsensm.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"ls_keyvault_properties_typeProperties_baseUrl": {
+			"value": "https://keyvaultnsm.vault.azure.net/"
+		},
+		"synapsensm-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://storageaccnsm.dfs.core.windows.net"
+		}
+	}
+}
