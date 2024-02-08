@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "a41f6c19-21c8-459a-9e21-7a0da273905f"
+				"spark.autotune.trackingId": "fccd9969-0a6a-476c-bb13-c4fedeff9cdb"
 			}
 		},
 		"metadata": {
@@ -130,7 +130,7 @@
 					"\r\n",
 					"if not any(mount.mountPoint == mount_point_dest for mount in mssparkutils.fs.mounts()):\r\n",
 					"    mssparkutils.fs.mount(  \r\n",
-					"        \"abfss://bronze@storageaccnsm.dfs.core.windows.net\",\r\n",
+					"        \"abfss://silver@storageaccnsm.dfs.core.windows.net\",\r\n",
 					"        mount_point_dest, #Mount Point Name  \r\n",
 					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
 					"    )"

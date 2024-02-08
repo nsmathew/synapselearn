@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "cae6b842-df16-4cb9-a8f8-3aa3264cf04f"
+				"spark.autotune.trackingId": "d13dbbab-5eb7-4bea-851d-75d9ae6bfa62"
 			}
 		},
 		"metadata": {
@@ -43,7 +43,8 @@
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
 				"cores": 4,
-				"memory": 28
+				"memory": 28,
+				"automaticScaleJobs": false
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -104,7 +105,7 @@
 					"output_path = 'synfs:/' + jobid + mount_point_dest + '/SalesLT/'\r\n",
 					"#input_path"
 				],
-				"execution_count": 9
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -135,7 +136,7 @@
 					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
 					"    )"
 				],
-				"execution_count": 14
+				"execution_count": 15
 			},
 			{
 				"cell_type": "code",
@@ -154,7 +155,7 @@
 					"print(mssparkutils.fs.ls('synfs:/' + jobid + mount_point_src))\r\n",
 					"print(mssparkutils.fs.ls('synfs:/' + jobid + mount_point_dest))"
 				],
-				"execution_count": 17
+				"execution_count": 16
 			},
 			{
 				"cell_type": "markdown",
@@ -187,7 +188,7 @@
 					"for i in mssparkutils.fs.ls(input_path):\r\n",
 					"    table_name.append(i.name.split('/')[0])"
 				],
-				"execution_count": 18
+				"execution_count": 17
 			},
 			{
 				"cell_type": "code",
@@ -205,7 +206,7 @@
 				"source": [
 					"table_name"
 				],
-				"execution_count": 23
+				"execution_count": 18
 			},
 			{
 				"cell_type": "markdown",
@@ -235,7 +236,7 @@
 				},
 				"source": [
 					"for i in table_name:\r\n",
-					"    in_path = input_path + i + '/' + i +'.parquet'\r\n",
+					"    in_path = input_path + i\r\n",
 					"    df = spark.read.format('delta').load(in_path)\r\n",
 					"    columns = df.columns\r\n",
 					"\r\n",
@@ -247,7 +248,7 @@
 					"    df.write.format('delta').mode('overwrite').save(out_path)\r\n",
 					""
 				],
-				"execution_count": 24
+				"execution_count": 19
 			},
 			{
 				"cell_type": "code",
@@ -267,7 +268,7 @@
 					"# Verify the last table change\r\n",
 					"display(df)"
 				],
-				"execution_count": 25
+				"execution_count": 20
 			},
 			{
 				"cell_type": "markdown",
@@ -299,7 +300,7 @@
 					"mssparkutils.fs.unmount(mount_point_src)\r\n",
 					"mssparkutils.fs.unmount(mount_point_dest)"
 				],
-				"execution_count": 13
+				"execution_count": 21
 			}
 		]
 	}
