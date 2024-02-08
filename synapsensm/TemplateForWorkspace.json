@@ -236,8 +236,13 @@
 								"type": "BigDataPoolReference"
 							},
 							"executorSize": "Small",
-							"conf": {},
-							"driverSize": "Small"
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
 						}
 					}
 				],
@@ -252,7 +257,6 @@
 				"[concat(variables('workspaceId'), '/notebooks/Bronze to Silver')]",
 				"[concat(variables('workspaceId'), '/bigDataPools/sparkpoolnsm')]",
 				"[concat(variables('workspaceId'), '/notebooks/Silver to Gold')]",
-				"[concat(variables('workspaceId'), '/bigDataPools/sparkpoolnsm')]",
 				"[concat(variables('workspaceId'), '/datasets/dsLocalSqlTable')]",
 				"[concat(variables('workspaceId'), '/datasets/BronzeParquet')]"
 			]
