@@ -11,6 +11,11 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage1'"
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase1'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapsensm-ondemand.sql.azuresynapse.net;Initial Catalog=gold_db"
+		},
 		"SqlServer1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'SqlServer1'",
@@ -262,6 +267,127 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Create Views')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Table Names",
+						"type": "GetMetadata",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "Binary1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "BinaryReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Table Names",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Table Names').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[dbo].[CreateSQLServerlessView_gold]",
+										"storedProcedureParameters": {
+											"ViewName": {
+												"value": {
+													"value": "@item().name",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureSqlDatabase1",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/Binary1')]",
+				"[concat(variables('workspaceId'), '/linkedServices/AzureSqlDatabase1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/Binary1')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "synapsensm-WorkspaceDefaultStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "SalesLT",
+						"fileSystem": "gold"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/synapsensm-WorkspaceDefaultStorage')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/BronzeParquet')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -350,6 +476,25 @@
 						"type": "SecureString",
 						"value": "[parameters('AzureDataLakeStorage1_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/AzureSqlDatabase1')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureSqlDatabase1_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -484,6 +629,26 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/sp_create_gold_views')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "use gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold @ViewName nvarchar(100)\nAS\nBEGIN\nDECLARE @statement VARCHAR(MAX)\n    SET @statement = N'CREATE OR ALTER VIEW ' + @ViewName + ' AS \n            SELECT * \n            FROM \n            OPENROWSET(\n                BULK ''https://storageaccnsm.dfs.core.windows.net/gold/SalesLT/' + @ViewName + '/'',\n                FORMAT = ''DELTA''\n            ) as [result]'\n            \nEXEC (@statement)\n\nEND\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "gold_db",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Bronze to Silver')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -505,7 +670,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1d9ad322-798b-4ae2-99b9-906c7bf40ea7"
+						"spark.autotune.trackingId": "fccd9969-0a6a-476c-bb13-c4fedeff9cdb"
 					}
 				},
 				"metadata": {
@@ -530,8 +695,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -551,7 +715,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.functions import from_utc_timestamp, date_format\r\n",
 							"from pyspark.sql.types  import TimestampType\r\n",
@@ -620,7 +783,7 @@
 							"\r\n",
 							"if not any(mount.mountPoint == mount_point_dest for mount in mssparkutils.fs.mounts()):\r\n",
 							"    mssparkutils.fs.mount(  \r\n",
-							"        \"abfss://bronze@storageaccnsm.dfs.core.windows.net\",\r\n",
+							"        \"abfss://silver@storageaccnsm.dfs.core.windows.net\",\r\n",
 							"        mount_point_dest, #Mount Point Name  \r\n",
 							"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
 							"    )"
@@ -823,7 +986,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "cae6b842-df16-4cb9-a8f8-3aa3264cf04f"
+						"spark.autotune.trackingId": "d13dbbab-5eb7-4bea-851d-75d9ae6bfa62"
 					}
 				},
 				"metadata": {
@@ -911,7 +1074,7 @@
 							"#input_path"
 						],
 						"outputs": [],
-						"execution_count": 9
+						"execution_count": 14
 					},
 					{
 						"cell_type": "code",
@@ -943,7 +1106,7 @@
 							"    )"
 						],
 						"outputs": [],
-						"execution_count": 14
+						"execution_count": 15
 					},
 					{
 						"cell_type": "code",
@@ -963,7 +1126,7 @@
 							"print(mssparkutils.fs.ls('synfs:/' + jobid + mount_point_dest))"
 						],
 						"outputs": [],
-						"execution_count": 17
+						"execution_count": 16
 					},
 					{
 						"cell_type": "markdown",
@@ -997,7 +1160,7 @@
 							"    table_name.append(i.name.split('/')[0])"
 						],
 						"outputs": [],
-						"execution_count": 18
+						"execution_count": 17
 					},
 					{
 						"cell_type": "code",
@@ -1016,7 +1179,7 @@
 							"table_name"
 						],
 						"outputs": [],
-						"execution_count": 23
+						"execution_count": 18
 					},
 					{
 						"cell_type": "markdown",
@@ -1046,7 +1209,7 @@
 						},
 						"source": [
 							"for i in table_name:\r\n",
-							"    in_path = input_path + i + '/' + i +'.parquet'\r\n",
+							"    in_path = input_path + i\r\n",
 							"    df = spark.read.format('delta').load(in_path)\r\n",
 							"    columns = df.columns\r\n",
 							"\r\n",
@@ -1059,7 +1222,7 @@
 							""
 						],
 						"outputs": [],
-						"execution_count": 24
+						"execution_count": 19
 					},
 					{
 						"cell_type": "code",
@@ -1080,7 +1243,7 @@
 							"display(df)"
 						],
 						"outputs": [],
-						"execution_count": 25
+						"execution_count": 20
 					},
 					{
 						"cell_type": "markdown",
@@ -1113,7 +1276,7 @@
 							"mssparkutils.fs.unmount(mount_point_dest)"
 						],
 						"outputs": [],
-						"execution_count": 13
+						"execution_count": 21
 					}
 				]
 			},

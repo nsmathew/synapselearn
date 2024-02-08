@@ -8,6 +8,9 @@
 		"AzureDataLakeStorage1_accountKey": {
 			"value": ""
 		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapsensm-ondemand.sql.azuresynapse.net;Initial Catalog=gold_db"
+		},
 		"SqlServer1_connectionString": {
 			"value": "Integrated Security=False;Data Source=localhost;Initial Catalog=AdventureWorksLT2017;User ID=nsmlocal"
 		},
