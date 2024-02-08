@@ -424,7 +424,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "e693ca3f-02f6-40e5-b639-d2aa17c9d500"
+						"spark.autotune.trackingId": "a531bc9c-3816-44db-a014-d7360d80783a"
 					}
 				},
 				"metadata": {
@@ -508,11 +508,12 @@
 						"source": [
 							"jobid = mssparkutils.env.getJobId()\r\n",
 							"input_path = 'synfs:/' + jobid + '/mnt/bronze/SalesLT/'\r\n",
-							"input_path\r\n",
+							"output_path = 'synfs:/' + jobid + '/mnt/silver/SalesLT/'\r\n",
+							"#input_path\r\n",
 							"mount_point = '/mnt/bronze'"
 						],
 						"outputs": [],
-						"execution_count": 51
+						"execution_count": 61
 					},
 					{
 						"cell_type": "code",
@@ -638,15 +639,15 @@
 						},
 						"source": [
 							"for i in table_name:\r\n",
-							"    path = input_path + i + '/' + i +'.parquet'\r\n",
-							"    df = spark.read.format('parquet').load(path)\r\n",
+							"    in_path = input_path + i + '/' + i +'.parquet'\r\n",
+							"    df = spark.read.format('parquet').load(in_path)\r\n",
 							"    columns = df.columns\r\n",
 							"\r\n",
 							"    for col in columns:\r\n",
 							"        if \"Date\" in col or \"date\" in col:\r\n",
 							"            df = df.withColumn(col, date_format(from_utc_timestamp(df[col].cast(TimestampType()), \"UTC\"), \"yyyy-MM-dd\"))\r\n",
-							"    output_path = path + i + '/'\r\n",
-							"    df.write.format('delta').mode('overwrite').save(output_path)\r\n",
+							"    out_path = output_path + i + '/'\r\n",
+							"    df.write.format('delta').mode('overwrite').save(out_path)\r\n",
 							""
 						],
 						"outputs": [],
