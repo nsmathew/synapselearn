@@ -18,7 +18,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "6a2abcb1-0dc4-43b9-82ae-6df4de1e0c6a"
+				"spark.autotune.trackingId": "59f79d63-b076-48c2-b74d-41770b69c181"
 			}
 		},
 		"metadata": {
@@ -99,13 +99,13 @@
 				},
 				"source": [
 					"jobid = mssparkutils.env.getJobId()\r\n",
-					"input_path = 'synfs:/' + jobid + '/mnt/silver/SalesLT/'\r\n",
-					"output_path = 'synfs:/' + jobid + '/mnt/gold/SalesLT/'\r\n",
-					"#input_path\r\n",
 					"mount_point_src = '/mnt/silver'\r\n",
-					"mount_point_dest = '/mnt/gold'"
+					"mount_point_dest = '/mnt/gold'\r\n",
+					"input_path = 'synfs:/' + jobid + mount_point_src+ '/SalesLT/'\r\n",
+					"output_path = 'synfs:/' + jobid + mount_point_dest + '/SalesLT/'\r\n",
+					"#input_path"
 				],
-				"execution_count": 61
+				"execution_count": 9
 			},
 			{
 				"cell_type": "code",
@@ -122,20 +122,21 @@
 				},
 				"source": [
 					"if not any(mount.mountPoint == mount_point_src for mount in mssparkutils.fs.mounts()):\r\n",
+					"    print(\"yes\")\r\n",
 					"    mssparkutils.fs.mount(  \r\n",
-					"        \"abfss://bronze@storageaccnsm.dfs.core.windows.net\",\r\n",
+					"        \"abfss://silver@storageaccnsm.dfs.core.windows.net\",\r\n",
 					"        mount_point_src, #Mount Point Name  \r\n",
 					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
 					"    )\r\n",
 					"\r\n",
 					"if not any(mount.mountPoint == mount_point_dest for mount in mssparkutils.fs.mounts()):\r\n",
 					"    mssparkutils.fs.mount(  \r\n",
-					"        \"abfss://bronze@storageaccnsm.dfs.core.windows.net\",\r\n",
+					"        \"abfss://gold@storageaccnsm.dfs.core.windows.net\",\r\n",
 					"        mount_point_dest, #Mount Point Name  \r\n",
 					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
 					"    )"
 				],
-				"execution_count": 57
+				"execution_count": 14
 			},
 			{
 				"cell_type": "code",
@@ -151,9 +152,10 @@
 					}
 				},
 				"source": [
-					"print(mssparkutils.fs.ls(input_path))"
+					"print(mssparkutils.fs.ls('synfs:/' + jobid + mount_point_src))\r\n",
+					"print(mssparkutils.fs.ls('synfs:/' + jobid + mount_point_dest))"
 				],
-				"execution_count": 59
+				"execution_count": 17
 			},
 			{
 				"cell_type": "markdown",
@@ -186,7 +188,7 @@
 					"for i in mssparkutils.fs.ls(input_path):\r\n",
 					"    table_name.append(i.name.split('/')[0])"
 				],
-				"execution_count": 22
+				"execution_count": 18
 			},
 			{
 				"cell_type": "code",
@@ -298,7 +300,7 @@
 					"mssparkutils.fs.unmount(mount_point_src)\r\n",
 					"mssparkutils.fs.unmount(mount_point_dest)"
 				],
-				"execution_count": 60
+				"execution_count": 13
 			}
 		]
 	}
