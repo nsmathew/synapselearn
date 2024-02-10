@@ -1,6 +1,9 @@
 {
 	"name": "Bronze to Silver",
 	"properties": {
+		"folder": {
+			"name": "AdventureWorks"
+		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
 		"bigDataPool": {
@@ -18,7 +21,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "fccd9969-0a6a-476c-bb13-c4fedeff9cdb"
+				"spark.autotune.trackingId": "c3ed480d-ee44-4643-a90a-3777c818e1f8"
 			}
 		},
 		"metadata": {
@@ -32,7 +35,7 @@
 				"name": "python"
 			},
 			"a365ComputeOptions": {
-				"id": "/subscriptions/bc7ce994-a6fb-46bc-a192-b2843bd6fcc6/resourceGroups/dataengg2/providers/Microsoft.Synapse/workspaces/synapsensm/bigDataPools/sparkpoolnsm",
+				"id": "/subscriptions/bc7ce994-a6fb-46bc-a192-b2843bd6fcc6/resourceGroups/dp203/providers/Microsoft.Synapse/workspaces/synapsensm/bigDataPools/sparkpoolnsm",
 				"name": "sparkpoolnsm",
 				"type": "Spark",
 				"endpoint": "https://synapsensm.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/sparkpoolnsm",
@@ -42,9 +45,9 @@
 				},
 				"sparkVersion": "3.3",
 				"nodeCount": 10,
-				"cores": 4,
-				"memory": 28,
-				"automaticScaleJobs": false
+				"cores": 8,
+				"memory": 56,
+				"automaticScaleJobs": true
 			},
 			"sessionKeepAliveTimeout": 30
 		},
@@ -125,14 +128,14 @@
 					"    mssparkutils.fs.mount(  \r\n",
 					"        \"abfss://bronze@storageaccnsm.dfs.core.windows.net\",\r\n",
 					"        mount_point_src, #Mount Point Name  \r\n",
-					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
+					"        { \"linkedService\" : \"synapsensm-WorkspaceDefaultStorage\"}  \r\n",
 					"    )\r\n",
 					"\r\n",
 					"if not any(mount.mountPoint == mount_point_dest for mount in mssparkutils.fs.mounts()):\r\n",
 					"    mssparkutils.fs.mount(  \r\n",
 					"        \"abfss://silver@storageaccnsm.dfs.core.windows.net\",\r\n",
 					"        mount_point_dest, #Mount Point Name  \r\n",
-					"        { \"linkedService\" : \"AzureDataLakeStorage1\"}  \r\n",
+					"        { \"linkedService\" : \"synapsensm-WorkspaceDefaultStorage\"}  \r\n",
 					"    )"
 				],
 				"execution_count": 57

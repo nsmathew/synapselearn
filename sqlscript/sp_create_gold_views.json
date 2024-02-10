@@ -1,6 +1,9 @@
 {
 	"name": "sp_create_gold_views",
 	"properties": {
+		"folder": {
+			"name": "Adventure Works"
+		},
 		"content": {
 			"query": "use gold_db\nGO\n\nCREATE OR ALTER PROC CreateSQLServerlessView_gold @ViewName nvarchar(100)\nAS\nBEGIN\nDECLARE @statement VARCHAR(MAX)\n    SET @statement = N'CREATE OR ALTER VIEW ' + @ViewName + ' AS \n            SELECT * \n            FROM \n            OPENROWSET(\n                BULK ''https://storageaccnsm.dfs.core.windows.net/gold/SalesLT/' + @ViewName + '/'',\n                FORMAT = ''DELTA''\n            ) as [result]'\n            \nEXEC (@statement)\n\nEND\nGO",
 			"metadata": {

@@ -139,10 +139,6 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkpoolnsm",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false,
@@ -178,10 +174,6 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
-					"sparkPool": {
-						"referenceName": "sparkpoolnsm",
-						"type": "BigDataPoolReference"
-					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false,
@@ -193,6 +185,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "Adventure Works"
+		},
 		"annotations": [],
 		"lastPublishTime": "2024-02-08T18:49:37Z"
 	},
