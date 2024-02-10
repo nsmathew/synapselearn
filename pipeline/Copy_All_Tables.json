@@ -143,6 +143,10 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool1nsm",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false,
@@ -178,6 +182,10 @@
 						"type": "NotebookReference"
 					},
 					"snapshot": true,
+					"sparkPool": {
+						"referenceName": "sparkpool1nsm",
+						"type": "BigDataPoolReference"
+					},
 					"executorSize": "Small",
 					"conf": {
 						"spark.dynamicAllocation.enabled": false,
