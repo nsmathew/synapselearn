@@ -210,6 +210,10 @@
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "sparkpool1nsm",
+								"type": "BigDataPoolReference"
+							},
 							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": false,
@@ -245,6 +249,10 @@
 								"type": "NotebookReference"
 							},
 							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "sparkpool1nsm",
+								"type": "BigDataPoolReference"
+							},
 							"executorSize": "Small",
 							"conf": {
 								"spark.dynamicAllocation.enabled": false,
@@ -268,6 +276,7 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/ds_TableNames')]",
 				"[concat(variables('workspaceId'), '/notebooks/Bronze to Silver')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/sparkpool1nsm')]",
 				"[concat(variables('workspaceId'), '/notebooks/Silver to Gold')]",
 				"[concat(variables('workspaceId'), '/datasets/dsLocalSqlTable')]",
 				"[concat(variables('workspaceId'), '/datasets/BronzeParquet')]"
@@ -1081,7 +1090,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "dcf0869e-4eb9-44a1-98ae-fa3a7bc8a100"
+						"spark.autotune.trackingId": "72e629e3-a3b3-4a54-8e83-b084253d419e"
 					}
 				},
 				"metadata": {
@@ -1106,8 +1115,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 30
 				},
@@ -1127,7 +1135,6 @@
 					},
 					{
 						"cell_type": "code",
-						"metadata": {},
 						"source": [
 							"from pyspark.sql.functions import from_utc_timestamp, date_format\r\n",
 							"from pyspark.sql.types  import TimestampType\r\n",
