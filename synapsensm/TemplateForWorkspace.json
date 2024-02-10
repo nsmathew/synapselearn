@@ -362,6 +362,82 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('ContainerArray')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Web1",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "PUT",
+										"headers": {
+											"x-ms-version": "2023-11-03",
+											"Date": "Sat, 10 Feb 2024 17:06:00 GMT"
+										},
+										"url": {
+											"value": "@{concat('https://storageaccnsm.blob.core.windows.net/',item(),'?restype=container?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupyx&se=2024-02-11T01:22:58Z&st=2024-02-10T17:22:58Z&spr=https&sig=tdkQ8o9SbwMyDp%2Bw4AFYGPdbrriWgfDvSBuqdw7GGlM%3D')}",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"body": "None",
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://management.azure.com"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"ContainerArray": {
+						"type": "Array",
+						"defaultValue": [
+							"bronze",
+							"gold",
+							"silver"
+						]
+					}
+				},
+				"folder": {
+					"name": "Adventure Works"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/Binary1')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -519,9 +595,14 @@
 						},
 						"secretName": "localsqlPassword"
 					}
+				},
+				"connectVia": {
+					"referenceName": "IntegrationRuntime1",
+					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/IntegrationRuntime1')]",
 				"[concat(variables('workspaceId'), '/linkedServices/ls_keyvault')]"
 			]
 		},
