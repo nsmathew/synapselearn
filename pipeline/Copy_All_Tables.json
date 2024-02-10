@@ -5,6 +5,8 @@
 			{
 				"name": "Lookup table names from local",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -31,6 +33,8 @@
 			{
 				"name": "ForEach SalesLT Table",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Lookup table names from local",
